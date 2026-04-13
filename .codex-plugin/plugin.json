@@ -1,0 +1,37 @@
+{
+  "name": "andrej-karpathy-skills",
+  "version": "2.0.0",
+  "description": "Karpathy-inspired coding guidelines for Codex. Use them to surface assumptions, avoid overengineering, make surgical changes, and define verifiable success criteria.",
+  "author": {
+    "name": "nguyenphutrong",
+    "url": "https://github.com/nguyenphutrong"
+  },
+  "homepage": "https://github.com/nguyenphutrong/andrej-karpathy-skills",
+  "repository": "https://github.com/nguyenphutrong/andrej-karpathy-skills",
+  "license": "MIT",
+  "keywords": [
+    "guidelines",
+    "best-practices",
+    "coding",
+    "karpathy",
+    "codex"
+  ],
+  "skills": "./.agents/skills/",
+  "interface": {
+    "displayName": "Andrej Karpathy Skills",
+    "shortDescription": "Karpathy-inspired coding guidelines for Codex.",
+    "longDescription": "A Codex-first plugin that packages Karpathy-inspired guidelines for surfacing assumptions, preferring simpler solutions, keeping edits surgical, and working against concrete verification criteria.",
+    "developerName": "nguyenphutrong",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/nguyenphutrong/andrej-karpathy-skills",
+    "defaultPrompt": [
+      "Use Karpathy Guidelines while reviewing this change for hidden assumptions and unnecessary complexity.",
+      "Apply Karpathy Guidelines before implementing this task and give me a short verification plan."
+    ],
+    "brandColor": "#10A37F"
+  }
+}

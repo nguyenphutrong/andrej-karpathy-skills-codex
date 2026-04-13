@@ -1,160 +1,100 @@
-# Karpathy-Inspired Claude Code Guidelines
+# Andrej Karpathy Skills For Codex
 
-A single `CLAUDE.md` file to improve Claude Code behavior, derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876) on LLM coding pitfalls.
+This repository packages Karpathy-inspired coding guidelines as a Codex skill and a Codex plugin. It is designed for Codex CLI and the Codex app, with one canonical skill source under `.agents/skills/`.
 
-## The Problems
+This Codex-first port is based on the original repository [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills).
 
-From Andrej's post:
+The guidelines target four common failure modes in coding agents:
+- hidden assumptions
+- overengineering
+- broad, unnecessary edits
+- weak or missing verification criteria
 
-> "The models make wrong assumptions on your behalf and just run along with them without checking. They don't manage their confusion, don't seek clarifications, don't surface inconsistencies, don't present tradeoffs, don't push back when they should."
+## What This Repo Contains
 
-> "They really like to overcomplicate code and APIs, bloat abstractions, don't clean up dead code... implement a bloated construction over 1000 lines when 100 would do."
+- Repo-scoped skill at `.agents/skills/karpathy-guidelines/`
+- Codex plugin manifest at `.codex-plugin/plugin.json`
+- Repo marketplace at `.agents/plugins/marketplace.json`
+- Worked examples in `EXAMPLES.md`
 
-> "They still sometimes change/remove comments and code they don't sufficiently understand as side effects, even if orthogonal to the task."
+The skill name is `karpathy-guidelines`, so you can invoke it directly with `$karpathy-guidelines`.
 
-## The Solution
-
-Four principles in one file that directly address these issues:
-
-| Principle | Addresses |
-|-----------|-----------|
-| **Think Before Coding** | Wrong assumptions, hidden confusion, missing tradeoffs |
-| **Simplicity First** | Overcomplication, bloated abstractions |
-| **Surgical Changes** | Orthogonal edits, touching code you shouldn't |
-| **Goal-Driven Execution** | Leverage through tests-first, verifiable success criteria |
-
-## The Four Principles in Detail
+## The Four Principles
 
 ### 1. Think Before Coding
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
-
-LLMs often pick an interpretation silently and run with it. This principle forces explicit reasoning:
-
-- **State assumptions explicitly** — If uncertain, ask rather than guess
-- **Present multiple interpretations** — Don't pick silently when ambiguity exists
-- **Push back when warranted** — If a simpler approach exists, say so
-- **Stop when confused** — Name what's unclear and ask for clarification
+Don't assume. Surface ambiguity, tradeoffs, and confusion before implementation.
 
 ### 2. Simplicity First
 
-**Minimum code that solves the problem. Nothing speculative.**
-
-Combat the tendency toward overengineering:
-
-- No features beyond what was asked
-- No abstractions for single-use code
-- No "flexibility" or "configurability" that wasn't requested
-- No error handling for impossible scenarios
-- If 200 lines could be 50, rewrite it
-
-**The test:** Would a senior engineer say this is overcomplicated? If yes, simplify.
+Prefer the minimum code that solves the actual request. Avoid speculative abstractions.
 
 ### 3. Surgical Changes
 
-**Touch only what you must. Clean up only your own mess.**
-
-When editing existing code:
-
-- Don't "improve" adjacent code, comments, or formatting
-- Don't refactor things that aren't broken
-- Match existing style, even if you'd do it differently
-- If you notice unrelated dead code, mention it — don't delete it
-
-When your changes create orphans:
-
-- Remove imports/variables/functions that YOUR changes made unused
-- Don't remove pre-existing dead code unless asked
-
-**The test:** Every changed line should trace directly to the user's request.
+Touch only what the task requires. Avoid drive-by refactors and unrelated cleanup.
 
 ### 4. Goal-Driven Execution
 
-**Define success criteria. Loop until verified.**
+Turn vague tasks into concrete, verifiable success criteria and loop until verified.
 
-Transform imperative tasks into verifiable goals:
+## Use As A Repo-Scoped Skill
 
-| Instead of... | Transform to... |
-|--------------|-----------------|
-| "Add validation" | "Write tests for invalid inputs, then make them pass" |
-| "Fix the bug" | "Write a test that reproduces it, then make it pass" |
-| "Refactor X" | "Ensure tests pass before and after" |
+Codex automatically scans `.agents/skills` from the current working directory up to the repo root.
 
-For multi-step tasks, state a brief plan:
+1. Clone this repository.
+2. Open Codex at the repository root.
+3. Open the skill picker with `/skills` or type `$`.
+4. Invoke `$karpathy-guidelines` explicitly, or let Codex match it implicitly from the task.
 
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
+This is the simplest way to use the guidelines while working inside this repository.
 
-Strong success criteria let the LLM loop independently. Weak criteria ("make it work") require constant clarification.
+## Install As A Local Codex Plugin
 
-## Install
+This repository also acts as its own plugin root. The local marketplace entry already lives at `.agents/plugins/marketplace.json`.
 
-**Option A: Claude Code Plugin (recommended)**
+To test it in Codex:
 
-From within Claude Code, first add the marketplace:
-```
-/plugin marketplace add forrestchang/andrej-karpathy-skills
-```
+1. Open Codex with this repository as the active repo.
+2. Restart Codex so it reloads the repo marketplace.
+3. Open the plugin directory.
+4. Select the repo marketplace named `Andrej Karpathy Local Plugins`.
+5. Install `andrej-karpathy-skills`.
 
-Then install the plugin:
-```
-/plugin install andrej-karpathy-skills@karpathy-skills
-```
+After installation, the packaged skill should be available in Codex App alongside any repo-scoped discovery.
 
-This installs the guidelines as a Claude Code plugin, making the skill available across all your projects.
+## Verify The Port
 
-**Option B: CLAUDE.md (per-project)**
+Static checks you can run locally:
 
-New project:
 ```bash
-curl -o CLAUDE.md https://raw.githubusercontent.com/forrestchang/andrej-karpathy-skills/main/CLAUDE.md
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+for path in [
+    Path(".codex-plugin/plugin.json"),
+    Path(".agents/plugins/marketplace.json"),
+]:
+    json.loads(path.read_text())
+    print(f"ok: {path}")
+PY
 ```
 
-Existing project (append):
 ```bash
-echo "" >> CLAUDE.md
-curl https://raw.githubusercontent.com/forrestchang/andrej-karpathy-skills/main/CLAUDE.md >> CLAUDE.md
+ruby -e 'require "yaml"; YAML.load_file(".agents/skills/karpathy-guidelines/agents/openai.yaml"); puts "ok: .agents/skills/karpathy-guidelines/agents/openai.yaml"'
 ```
 
-## Key Insight
+Interactive smoke checks:
 
-From Andrej:
+1. Confirm `$karpathy-guidelines` appears in `/skills` when Codex opens this repo.
+2. Confirm the plugin appears in the repo marketplace and installs successfully.
+3. Confirm the skill metadata shown in Codex App matches the plugin and skill descriptions.
 
-> "LLMs are exceptionally good at looping until they meet specific goals... Don't tell it what to do, give it success criteria and watch it go."
+## References
 
-The "Goal-Driven Execution" principle captures this: transform imperative instructions into declarative goals with verification loops.
-
-## How to Know It's Working
-
-These guidelines are working if you see:
-
-- **Fewer unnecessary changes in diffs** — Only requested changes appear
-- **Fewer rewrites due to overcomplication** — Code is simple the first time
-- **Clarifying questions come before implementation** — Not after mistakes
-- **Clean, minimal PRs** — No drive-by refactoring or "improvements"
-
-## Customization
-
-These guidelines are designed to be merged with project-specific instructions. Add them to your existing `CLAUDE.md` or create a new one.
-
-For project-specific rules, add sections like:
-
-```markdown
-## Project-Specific Guidelines
-
-- Use TypeScript strict mode
-- All API endpoints must have tests
-- Follow the existing error handling patterns in `src/utils/errors.ts`
-```
-
-## Tradeoff Note
-
-These guidelines bias toward **caution over speed**. For trivial tasks (simple typo fixes, obvious one-liners), use judgment — not every change needs the full rigor.
-
-The goal is reducing costly mistakes on non-trivial work, not slowing down simple tasks.
+- [Codex skills docs](https://developers.openai.com/codex/skills.md)
+- [Codex plugin build docs](https://developers.openai.com/codex/plugins/build.md)
+- [Examples](./EXAMPLES.md)
 
 ## License
 

@@ -1,0 +1,20 @@
+{
+  "name": "andrej-karpathy-local",
+  "interface": {
+    "displayName": "Andrej Karpathy Local Plugins"
+  },
+  "plugins": [
+    {
+      "name": "andrej-karpathy-skills",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
